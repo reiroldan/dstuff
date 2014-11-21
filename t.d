@@ -1,4 +1,4 @@
-import std.stdio, std.string, std.conv;
+import std.stdio, std.string, std.conv, std.exception;
 
 class ZmqMessage {
 
@@ -7,13 +7,12 @@ private:
     alias frame = void[];
     frame[] _buffer;
     size_t _length;
-    frame[64] _initialBuffer;  
 
 public:
 
     this() {
         _length = 0;
-        _buffer = _initialBuffer;
+        _buffer = new frame[64];
     }
 
     this(size_t capacity) {
@@ -44,7 +43,12 @@ public:
 
     // add to the front
     void push(void[] frame) {
-        insert(0, frame);
+        if (_length == _buffer.length)
+            ensureCapacity(_length + 1);
+
+		_buffer[1 .. $] = _buffer[0 .. $ - 1];		
+        _buffer[0] = frame;
+        _length++;        
     }
 
     unittest {
@@ -58,22 +62,7 @@ public:
 
     void[] pop() {
         return null;
-    }
-
-    void insert(size_t index, void[] frame) {
-        enforce (index > _length, "Can't insert frame past the end of the message.");
-    
-        if (_length == _buffer.length) {
-            ensureCapacity(_length + 1);
-	}
-	
-	if (index < _length) {
-		_buffer[index + 1 .. _length - index] = _buffer[index .. $];
-	}
-	
-        _buffer[index] = frame;
-        _length++;        
-    }
+    }    
 
     @property size_t length() { return _length; }
 
@@ -84,7 +73,7 @@ public:
     @property void capacity(size_t value) {
         if(value == _buffer.length) {
             return;
-	}
+		}
         
         enforce(value < _length, "Capacity can't go below the current length");
                 
@@ -93,6 +82,7 @@ public:
         if (_length > 0) {
             array = _buffer[0 .. _length];            
         }
+
         _buffer = array;
 
         return;            
