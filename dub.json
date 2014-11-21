@@ -1,0 +1,8 @@
+{
+	"name": "test",
+	"description": "D test",
+	"targetType": "executable",
+	"authors": ["rei roldan"],
+	"buildOptions": [ "unittests", "debugMode" ],
+	"sourcePaths": [ "." ]
+}
