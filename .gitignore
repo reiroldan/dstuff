@@ -4,4 +4,4 @@ __dummy.html
 *.o
 *.obj
 *.exe
-/dub.selections.json
+dub.selections.json
