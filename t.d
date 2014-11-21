@@ -61,15 +61,16 @@ public:
     }
 
     void insert(size_t index, void[] frame) {
-        if (index > _length)
-            throw new Exception("Can't insert frame past the end of the message.");
+        enforce (index > _length, "Can't insert frame past the end of the message.");
     
-        if (_length == _buffer.length)
+        if (_length == _buffer.length) {
             ensureCapacity(_length + 1);
-			
-		if (index < _length) 
-			_buffer[index + 1 .. _length - index] = _buffer[index .. $];
-
+	}
+	
+	if (index < _length) {
+		_buffer[index + 1 .. _length - index] = _buffer[index .. $];
+	}
+	
         _buffer[index] = frame;
         _length++;        
     }
@@ -81,17 +82,17 @@ public:
     @property size_t capacity() { return _buffer.length; }
 
     @property void capacity(size_t value) {
-        if(value == _buffer.length)
+        if(value == _buffer.length) {
             return;
-
-        if (value < _length)
-            throw new Exception("Capacity can't go below the current length");
+	}
+        
+        enforce(value < _length, "Capacity can't go below the current length");
                 
         frame[] array = new frame[value];
 
-        if (_length > 0)
+        if (_length > 0) {
             array = _buffer[0 .. _length];            
-        
+        }
         _buffer = array;
 
         return;            
@@ -102,13 +103,10 @@ private:
     void ensureCapacity(size_t min) {
         if(_buffer.length >= min)
             return;
-    
-        size_t num = (_buffer.length == 0) ? 4 : (_buffer.length * 2);
 
-        if (num < min)
-            num = min;
-        
-        capacity = num;        
+        if (_buffer.length ? (_buffer.length * 2) : 4 < min) {
+            capacity = min;
+        }
     }
 }
 
